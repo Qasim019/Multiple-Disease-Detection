@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Multiple Disease Prediction System{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <span class="eyebrow">Private local workspace · 03 models</span>
+    <h1>Make a clearer first pass on health data.</h1>
+    <p>Explore three focused screening models with guided inputs, transparent probability views, and no data leaving this app.</p>
+  </div>
+  <div class="hero-note"><span class="pulse-dot"></span><strong>Ready to screen</strong><span>Choose a model below</span></div>
+  {% if not models_ready %}
+  <div class="model-warning">
+    Models not found. Run <code>python train_models.py</code> in the project folder first, then reload this page.
+  </div>
+  {% endif %}
+</section>
+
+<section class="section-heading"><span class="eyebrow">Select a screening model</span><p>Each model is trained and scored independently.</p></section>
+<section class="card-grid">
+  <a class="disease-card diabetes {{ 'is-unavailable' if not diabetes_ready else '' }}" href="{{ url_for('diabetes') }}">
+    <div class="card-top"><span class="card-icon">01</span><span class="status">{{ 'Available' if diabetes_ready else 'Unavailable' }}</span></div>
+    <div class="marker-count">8 <small>markers</small></div>
+    <div class="marker-label">clinical markers</div>
+    <h2>Diabetes</h2>
+    <p>Glucose, BMI, insulin, and five other measurements from the PIMA Indians dataset.</p>
+    <span class="go">Open panel →</span>
+  </a>
+
+  <a class="disease-card heart {{ 'is-unavailable' if not heart_ready else '' }}" href="{{ url_for('heart') }}">
+    <div class="card-top"><span class="card-icon">02</span><span class="status">{{ 'Available' if heart_ready else 'Unavailable' }}</span></div>
+    <div class="marker-count">11 <small>markers</small></div>
+    <div class="marker-label">clinical markers</div>
+    <h2>Heart Disease</h2>
+    <p>Chest pain type, resting ECG, exercise angina, and more, from 918 patient records.</p>
+    <span class="go">Open panel →</span>
+  </a>
+
+  <a class="disease-card parkinsons {{ 'is-unavailable' if not parkinsons_ready else '' }}" href="{{ url_for('parkinsons') }}">
+    <div class="card-top"><span class="card-icon">03</span><span class="status">{{ 'Available' if parkinsons_ready else 'Unavailable' }}</span></div>
+    <div class="marker-count">22 <small>markers</small></div>
+    <div class="marker-label">voice markers</div>
+    <h2>Parkinson's</h2>
+    <p>Biomedical voice measurements — jitter, shimmer, and nonlinear frequency dynamics.</p>
+    <span class="go">Open panel →</span>
+  </a>
+</section>
+{% endblock %}

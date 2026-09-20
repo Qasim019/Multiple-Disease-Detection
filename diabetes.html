@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Diabetes — Prediction Panel{% endblock %}
+{% block header_action %}<a class="back-link" href="{{ url_for('index') }}">← All panels</a>{% endblock %}
+
+{% block content %}
+<div class="form-page diabetes">
+  <aside class="form-side">
+    <span class="tag diabetes">Diabetes panel</span>
+    <h1>Diabetes risk reading</h1>
+    <p>Based on the PIMA Indians Diabetes dataset. Enter the eight clinical values below as they appear on a standard metabolic panel.</p>
+  </aside>
+
+  <div>
+    {% if result %}
+      {% if result.error %}
+        <div class="result-banner errored">
+          <span class="result-label">Couldn't score that entry</span>
+          <span class="confidence">{{ result.error }}</span>
+        </div>
+      {% else %}
+        <div class="result-banner {{ 'positive' if result.positive else 'negative' }}">
+          <div><span class="eyebrow">Screening result</span><span class="result-label">{{ result.label }}</span></div>
+          {% if result.confidence is not none %}<span class="confidence">Model confidence <strong>{{ result.confidence }}%</strong></span>{% endif %}
+        </div>
+        {% if result.risk_percentage is not none %}
+        <section class="result-chart" aria-label="Diabetes risk chart">
+          <div class="chart-heading"><div><span class="eyebrow">Probability view</span><h2>What the model sees</h2></div><span class="chart-note">Class 1 risk estimate</span></div>
+          <div class="chart-layout">
+            <div class="donut" style="--risk: {{ result.risk_percentage }}%;"><div><strong>{{ result.risk_percentage }}%</strong><span>risk signal</span></div></div>
+            <div class="bar-chart"><div class="bar-row"><div><span>Risk signal</span><strong>{{ result.risk_percentage }}%</strong></div><div class="bar-track"><span class="bar-fill risk" style="width: {{ result.risk_percentage }}%;"></span></div></div><div class="bar-row"><div><span>Lower-risk signal</span><strong>{{ result.healthy_percentage }}%</strong></div><div class="bar-track"><span class="bar-fill healthy" style="width: {{ result.healthy_percentage }}%;"></span></div></div></div>
+          </div>
+        </section>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+
+    <form class="vitals-form" method="POST">
+      <div class="field-grid">
+        <div class="field">
+          <label for="Pregnancies">Pregnancies (count)</label>
+          <input type="number" step="1" min="0" id="Pregnancies" name="Pregnancies" value="{{ request.form.get('Pregnancies', 2) }}" required>
+        </div>
+        <div class="field">
+          <label for="Glucose">Plasma glucose (mg/dL)</label>
+          <input type="number" step="0.1" id="Glucose" name="Glucose" value="{{ request.form.get('Glucose', 120) }}" required>
+        </div>
+        <div class="field">
+          <label for="BloodPressure">Diastolic blood pressure (mm Hg)</label>
+          <input type="number" step="0.1" id="BloodPressure" name="BloodPressure" value="{{ request.form.get('BloodPressure', 70) }}" required>
+        </div>
+        <div class="field">
+          <label for="SkinThickness">Triceps skinfold thickness (mm)</label>
+          <input type="number" step="0.1" id="SkinThickness" name="SkinThickness" value="{{ request.form.get('SkinThickness', 20) }}" required>
+        </div>
+        <div class="field">
+          <label for="Insulin">2-hour serum insulin (mu U/mL)</label>
+          <input type="number" step="0.1" id="Insulin" name="Insulin" value="{{ request.form.get('Insulin', 80) }}" required>
+        </div>
+        <div class="field">
+          <label for="BMI">Body mass index</label>
+          <input type="number" step="0.1" id="BMI" name="BMI" value="{{ request.form.get('BMI', 28.5) }}" required>
+        </div>
+        <div class="field">
+          <label for="DiabetesPedigreeFunction">Diabetes pedigree function</label>
+          <input type="number" step="0.001" id="DiabetesPedigreeFunction" name="DiabetesPedigreeFunction" value="{{ request.form.get('DiabetesPedigreeFunction', 0.35) }}" required>
+        </div>
+        <div class="field">
+          <label for="Age">Age (years)</label>
+          <input type="number" step="1" min="0" id="Age" name="Age" value="{{ request.form.get('Age', 33) }}" required>
+        </div>
+      </div>
+      <div class="submit-row">
+        <button type="submit" class="predict-btn diabetes">Score this patient</button>
+        {% if not models_ready %}<span class="confidence">Model not loaded — run train_models.py</span>{% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

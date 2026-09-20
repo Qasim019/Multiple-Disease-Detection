@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Parkinson's — Prediction Panel{% endblock %}
+{% block header_action %}<a class="back-link" href="{{ url_for('index') }}">← All panels</a>{% endblock %}
+
+{% set defaults = {
+  "MDVP:Fo(Hz)": 154.2, "MDVP:Fhi(Hz)": 197.1, "MDVP:Flo(Hz)": 116.3,
+  "MDVP:Jitter(%)": 0.006, "MDVP:Jitter(Abs)": 0.00004, "MDVP:RAP": 0.003,
+  "MDVP:PPQ": 0.003, "Jitter:DDP": 0.009, "MDVP:Shimmer": 0.03,
+  "MDVP:Shimmer(dB)": 0.3, "Shimmer:APQ3": 0.015, "Shimmer:APQ5": 0.017,
+  "MDVP:APQ": 0.024, "Shimmer:DDA": 0.045, "NHR": 0.02, "HNR": 21.9,
+  "RPDE": 0.5, "DFA": 0.72, "spread1": -5.7, "spread2": 0.23,
+  "D2": 2.4, "PPE": 0.2
+} %}
+
+{% block content %}
+<div class="form-page parkinsons">
+  <aside class="form-side">
+    <span class="tag parkinsons">Neurology panel</span>
+    <h1>Parkinson's voice reading</h1>
+    <p>Based on the Oxford Parkinson's Disease Detection dataset — 22 biomedical measurements extracted from a sustained vowel voice recording.</p>
+  </aside>
+
+  <div>
+    {% if result %}
+      {% if result.error %}
+        <div class="result-banner errored">
+          <span class="result-label">Couldn't score that entry</span>
+          <span class="confidence">{{ result.error }}</span>
+        </div>
+      {% else %}
+        <div class="result-banner {{ 'positive' if result.positive else 'negative' }}">
+          <div><span class="eyebrow">Screening result</span><span class="result-label">{{ result.label }}</span></div>
+          {% if result.confidence is not none %}<span class="confidence">Model confidence <strong>{{ result.confidence }}%</strong></span>{% endif %}
+        </div>
+        {% if result.risk_percentage is not none %}
+        <section class="result-chart" aria-label="Parkinson's risk chart">
+          <div class="chart-heading"><div><span class="eyebrow">Probability view</span><h2>What the model sees</h2></div><span class="chart-note">Class 1 risk estimate</span></div>
+          <div class="chart-layout">
+            <div class="donut" style="--risk: {{ result.risk_percentage }}%;"><div><strong>{{ result.risk_percentage }}%</strong><span>risk signal</span></div></div>
+            <div class="bar-chart"><div class="bar-row"><div><span>Risk signal</span><strong>{{ result.risk_percentage }}%</strong></div><div class="bar-track"><span class="bar-fill risk" style="width: {{ result.risk_percentage }}%;"></span></div></div><div class="bar-row"><div><span>Lower-risk signal</span><strong>{{ result.healthy_percentage }}%</strong></div><div class="bar-track"><span class="bar-fill healthy" style="width: {{ result.healthy_percentage }}%;"></span></div></div></div>
+          </div>
+        </section>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+
+    <form class="vitals-form" method="POST">
+      <div class="field-grid">
+        {% for feat in features %}
+        <div class="field">
+          <label for="{{ feat }}">{{ feat }}</label>
+          <input type="number" step="any" id="{{ feat }}" name="{{ feat }}"
+                 value="{{ request.form.get(feat, defaults.get(feat, 0)) }}" required>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="submit-row">
+        <button type="submit" class="predict-btn parkinsons">Score this recording</button>
+        {% if not models_ready %}<span class="confidence">Model not loaded — run train_models.py</span>{% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

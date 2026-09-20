@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Primary Meta Tags -->
+  <title>{% block title %}Multiple Disease Prediction System{% endblock %}</title>
+  <meta name="description" content="Predict risk for Diabetes, Heart Disease, and Parkinson's using machine learning models.">
+  <meta name="author" content="Disease Prediction System">
+  <!-- Favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <!-- Skip to content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="site-title" href="{{ url_for('index') }}"><span class="brand-mark">+</span><span>Vital<span class="site-title-muted">Scope</span></span></a>
+      {% block header_action %}{% endblock %}
+    </div>
+  </header>
+
+  <main class="wrap" id="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>Educational screening tool</span><span>Not a diagnosis. Discuss results with a qualified clinician.</span>
+    </div>
+  </footer>
+</body>
+</html>
